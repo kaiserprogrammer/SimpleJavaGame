@@ -1,0 +1,9 @@
+An object-oriented implementation inspired by "How to Design Classes"
+
+The interesting part is the decomposition of the elements in the game
+and the Double Buffer Strategy implementation, which is when you know
+it fairly simple.
+
+It lacks an Input-System from the user, which can be easily
+implemented, by adding a method for UFOWorld which will pass the Key
+Event on to the Player/AUP and it will handle the correct update.
