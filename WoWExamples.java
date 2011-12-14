@@ -1,67 +1,52 @@
 import java.awt.*;
+
 import javax.swing.*;
 import java.awt.image.*;
 
 class WoWExamples {
-    // an anti-UFO platform placed in the center:
-    static AUP a = new AUP(100);
-    
-    // a UFO placed in the center, near the top of the world
-    static UFO u = new UFO (new Posn(100,5));
-    
-    // a UFO placed in the center, somewhat below u
-    static UFO u2 = new UFO (new Posn(100,8));
+  // an anti-UFO platform placed in the center:
+  static AUP a = new AUP(100);
 
-    // a Shot, right after being fired from a
-    static Shot s = new Shot(new Posn (110, 100));
+  // a UFO placed in the center, near the top of the world
+  static UFO u = new UFO(new Posn(100, 5));
 
-    // another Shot, above s
-    static Shot s2 = new Shot(new Posn (110,300));
-    
-    // an empty lists of shots
-    static IShots le = new MtShots();
+  // a Shot, right after being fired from a
+  static Shot s = new Shot(new Posn(110, 100));
 
-    // a list of one shot
-    static IShots ls = new ConsShots(s, new MtShots());
+  // another Shot, above s
+  static Shot s2 = new Shot(new Posn(110, 300));
 
-    // a list of two shots, one above the other
-    static IShots ls2 = new ConsShots(s2, new ConsShots(s, new MtShots()));
+  // a list of two shots, one above the other
+  static IShots ls = new ConsShots(s2, new ConsShots(s, new MtShots()));
 
-    // a complete world, with an empty list of shots
-    static UFOWorld w = new UFOWorld(u,a,le);
-    
-    // a complete world, with two shots
-    static UFOWorld w2 = new UFOWorld(u,a,ls2);
+  // a complete world, with two shots
+  static UFOWorld w = new UFOWorld(u, a, ls);
 
-    public static void main(String[] args) {
-        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        JFrame f = new JFrame();
-        Canvas c = new Canvas();
+  public static void main(String[] args) throws InterruptedException {
+    GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    JFrame frame = new JFrame(gc);
+    frame.setVisible(true);
+    frame.setIgnoreRepaint(true);
+    frame.setSize(w2.WIDTH, w2.HEIGHT);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        f.getContentPane().add(c);
-        f.setUndecorated(true);
-        f.setIgnoreRepaint(true);
-        f.setResizable(false);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        device.setFullScreenWindow(f);
+    frame.createBufferStrategy(3);
+    BufferStrategy strategy = frame.getBufferStrategy();
 
-        c.createBufferStrategy(1);
-        BufferStrategy strategy = c.getBufferStrategy();
-        Graphics g = null;
-
-        for (int i = 0; i < 100; i++) {
-            try {
-                Thread.sleep(50);
-            } catch (Exception e) {}
-            w2 = w2.move();
-            drawWorld(strategy, w2);
-        }
+    for (int i = 0; i < 100; i++) {
+      try {
+        Thread.sleep(30);
+      } catch (Exception e) {
+      }
+      w2 = w2.move();
+      do {
+        do {
+          Graphics g = strategy.getDrawGraphics();
+          w2.draw(g);
+          g.dispose();
+        } while (strategy.contentsRestored());
+      } while (strategy.contentsLost());
+      strategy.show();
     }
-
-    public static void drawWorld (BufferStrategy strategy, UFOWorld world) {
-        Graphics g = strategy.getDrawGraphics();
-        world.draw(g);
-        g.dispose();
-        strategy.show();
-    }
+  }
 }
